@@ -1096,6 +1096,8 @@ module.exports = (window => {
       story.onclick = e => {
         e.preventDefault();
 
+        if (story.parentElement.classList.contains('dragging')) return;
+
         modal.show(storyId);
       };
 
