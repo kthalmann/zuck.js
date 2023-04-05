@@ -78,7 +78,7 @@ module.exports = (window => {
   };
 
   /* Zuckera */
-  const ZuckJS = function (timeline, options) {
+  const ZuckJS = function (timeline, options, timeAgo) {
     const zuck = this;
     const option = function (name, prop) {
       const type = function (what) {
@@ -201,54 +201,6 @@ module.exports = (window => {
     if (!timeline.id) {
       timeline.setAttribute('id', generateId());
     }
-
-    const timeAgo = function (time) {
-      time = Number(time) * 1000;
-
-      const dateObj = new Date(time);
-      const dateStr = dateObj.getTime();
-      let seconds = (new Date().getTime() - dateStr) / 1000;
-
-      const language = option('language', 'time');
-
-      const formats = [
-        [60, ` ${language.seconds}`, 1], // 60
-        [120, `1 ${language.minute}`, ''], // 60*2
-        [3600, ` ${language.minutes}`, 60], // 60*60, 60
-        [7200, `1 ${language.hour}`, ''], // 60*60*2
-        [86400, ` ${language.hours}`, 3600], // 60*60*24, 60*60
-        [172800, ` ${language.yesterday}`, ''], // 60*60*24*2
-        [604800, ` ${language.days}`, 86400]
-      ];
-
-      let currentFormat = 1;
-      if (seconds < 0) {
-        seconds = Math.abs(seconds);
-
-        currentFormat = 2;
-      }
-
-      let result = false;
-      each(formats, (formatKey, format) => {
-        if (seconds < format[0] && !result) {
-          if (typeof format[2] === 'string') {
-            result = format[currentFormat];
-          } else if (format !== null) {
-            result = Math.floor(seconds / format[2]) + format[1];
-          }
-        }
-      });
-
-      if (!result) {
-        const day = dateObj.getDate();
-        const month = dateObj.getMonth();
-        const year = dateObj.getFullYear();
-
-        return `${day}/${month + 1}/${year}`;
-      } else {
-        return result;
-      }
-    };
 
     /* options */
     const id = timeline.id;
@@ -578,7 +530,7 @@ module.exports = (window => {
         const modalSlider = query(`#zuck-modal-slider-${id}`);
         const storyItems = get(storyData, 'items');
 
-        storyData.timeAgo = storyItems && storyItems[0] ? timeAgo(get(storyItems[0], 'time')) : '';
+        storyData.timeAgo = storyItems && storyItems[0] ? timeAgo.format(new Date(get(storyItems[0], 'time'))) : '';
 
         let htmlItems = '';
         let pointerItems = '';
@@ -594,7 +546,7 @@ module.exports = (window => {
 
         slides.className = 'slides';
         each(storyItems, (i, item) => {
-          item.timeAgo = timeAgo(get(item, 'time'));
+          item.timeAgo = timeAgo.format(new Date(get(item, 'time')));
 
           if (currentItem > i) {
             storyData.items[i].timeAgo = item.timeAgo;
@@ -1375,7 +1327,7 @@ module.exports = (window => {
           nextItem.classList.add('active');
 
           each(storyViewer.querySelectorAll('.time'), (i, el) => {
-            el.innerText = timeAgo(nextItem.getAttribute('data-time'));
+            el.innerText = timeAgo.format(new Date(nextItem.getAttribute('data-time')));
           });
 
           zuck.data[currentStory].currentItem = zuck.data[currentStory].currentItem + directionNumber;
