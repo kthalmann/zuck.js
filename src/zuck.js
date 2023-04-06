@@ -1346,6 +1346,8 @@ module.exports = (window => {
       }
     };
 
+    zuck.closeModal = modal.close;
+
     const init = function () {
       if (timeline && timeline.querySelector('.story')) {
         each(timeline.querySelectorAll('.story'), (storyIndex, story) => {
