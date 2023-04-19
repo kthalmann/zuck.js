@@ -765,8 +765,6 @@ module.exports = (window => {
               modalSlider.removeEventListener('touchend', touchEnd);
             }
 
-            const video = zuck.internalData.currentVideoElement;
-
             if (timer) {
               clearInterval(timer);
             }
@@ -799,19 +797,7 @@ module.exports = (window => {
                 }
               };
 
-              const storyViewerViewing = query('#zuck-modal .viewing');
-
-              if (storyViewerViewing && video) {
-                if (storyViewerViewing.classList.contains('muted')) {
-                  unmuteVideoItem(video, storyViewerViewing);
-                } else {
-                  navigateItem();
-                }
-              } else {
-                navigateItem();
-
-                return false;
-              }
+              navigateItem();
             }
           }
         };
@@ -820,6 +806,19 @@ module.exports = (window => {
         if (enableMouseEvents) {
           modalSlider.addEventListener('mousedown', touchStart);
         }
+      };
+
+      const createToggleSoundEvents = function (modalSliderElement) {
+        modalSliderElement.addEventListener('click', function (e) {
+          const target = e.target.closest('.story-actions__btn--mute');
+          const currentVideo = zuck.internalData.currentVideoElement;
+
+          if (target && currentVideo) {
+            zuck.internalData.currentVideoElement.muted
+              ? unmuteVideoItem(currentVideo)
+              : muteVideoItem(currentVideo);
+          }
+        });
       };
 
       return {
@@ -834,6 +833,7 @@ module.exports = (window => {
             const modalSlider = query(`#zuck-modal-slider-${id}`);
 
             createStoryTouchEvents(modalSlider);
+            createToggleSoundEvents(modalSlider);
 
             zuck.internalData.currentStory = storyId;
             storyData.currentItem = currentItem;
@@ -1106,7 +1106,9 @@ module.exports = (window => {
         cur.pause();
       }
 
-      if (itemElement.getAttribute('data-type') === 'video') {
+      const isVideo = itemElement.getAttribute('data-type') === 'video';
+
+      if (isVideo) {
         const video = itemElement.getElementsByTagName('video')[0];
         if (!video) {
           zuck.internalData.currentVideoElement = false;
@@ -1136,6 +1138,13 @@ module.exports = (window => {
       } else {
         zuck.internalData.currentVideoElement = false;
       }
+
+      const muteButton = itemElement.querySelector('.story-actions__btn--mute');
+      if (muteButton) {
+        isVideo
+          ? muteButton.removeAttribute('disabled')
+          : muteButton.setAttribute('disabled', 'disabled');
+      }
     };
 
     const pauseVideoItem = function () {
@@ -1161,6 +1170,11 @@ module.exports = (window => {
       if (storyViewer) {
         storyViewer.classList.remove('paused');
       }
+    };
+
+    const muteVideoItem = function (video) {
+      video.muted = true;
+      video.setAttribute('muted', true);
     };
 
     /* data functions */
