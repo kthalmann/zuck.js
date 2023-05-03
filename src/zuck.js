@@ -518,7 +518,7 @@ module.exports = (window => {
             if (items) {
               const storyViewer = query(`#zuck-modal .story-viewer[data-story-id="${currentStory}"]`);
 
-              playVideoItem(storyViewer, [items[0], items[1]], true);
+              playVideoItem(storyViewer, [items[0], items[1]]);
             }
 
             option('callbacks', 'onView')(zuck.internalData.currentStory);
@@ -616,7 +616,7 @@ module.exports = (window => {
         storyViewer.appendChild(slides);
 
         if (className === 'viewing') {
-          playVideoItem(storyViewer, storyViewer.querySelectorAll(`[data-index="${currentItem}"].active`), false);
+          playVideoItem(storyViewer, storyViewer.querySelectorAll(`[data-index="${currentItem}"].active`));
         }
 
         each(storyViewer.querySelectorAll('.slides-pointers [data-index] > b'), (i, el) => {
@@ -770,7 +770,7 @@ module.exports = (window => {
             }
 
             if (storyViewer) {
-              playVideoItem(storyViewer, storyViewer.querySelectorAll('.active'), false);
+              playVideoItem(storyViewer, storyViewer.querySelectorAll('.active'));
               storyViewer.classList.remove('longPress');
               storyViewer.classList.remove('paused');
             }
@@ -1093,7 +1093,7 @@ module.exports = (window => {
       });
     };
 
-    const playVideoItem = function (storyViewer, elements, unmute) {
+    const playVideoItem = function (storyViewer, elements) {
       const itemElement = elements[1];
       const itemPointer = elements[0];
 
@@ -1131,10 +1131,6 @@ module.exports = (window => {
         zuck.internalData.currentVideoElement = video;
 
         video.play();
-
-        if (unmute && unmute.target) {
-          unmuteVideoItem(video, storyViewer);
-        }
       } else {
         zuck.internalData.currentVideoElement = false;
       }
@@ -1346,7 +1342,7 @@ module.exports = (window => {
 
           zuck.data[currentStory].currentItem = zuck.data[currentStory].currentItem + directionNumber;
 
-          playVideoItem(storyViewer, nextItems, event);
+          playVideoItem(storyViewer, nextItems);
         };
 
         let callback = option('callbacks', 'onNavigateItem');
