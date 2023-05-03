@@ -1131,6 +1131,8 @@ module.exports = (window => {
         zuck.internalData.currentVideoElement = video;
 
         video.play();
+
+        muteVideoItem(video);
       } else {
         zuck.internalData.currentVideoElement = false;
       }
